@@ -44,5 +44,6 @@ const DB = {
   async getPresupuestos() { return await this.request('GET', '/api/presupuestos') || []; },
   async crearPresupuesto(data) { return this.request('POST', '/api/presupuestos', data); },
   async actualizarPresupuesto(id, data) { return this.request('PUT', `/api/presupuestos/${id}`, data); },
-  async eliminarPresupuesto(id) { return this.request('DELETE', `/api/presupuestos/${id}`); }
+ async eliminarPresupuesto(id) { return this.request('DELETE', `/api/presupuestos/${id}`); },
+async actualizarPerfil(data) { return this.request('PUT', '/api/perfil', data); }
 };

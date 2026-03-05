@@ -188,5 +188,32 @@ router.delete('/presupuestos/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+router.put('/perfil', async (req, res) => {
+  try {
+    if (!req.session.usuario) return res.status(401).json({ error: 'No autorizado' });
+    const { email, passActual, passNueva } = req.body;
+    const userId = req.session.usuario.id;
+    const [rows] = await db.execute(
+      'SELECT * FROM usuarios WHERE id = ? AND password = ?',
+      [userId, passActual]
+    );
+    if (rows.length === 0) return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+    if (passNueva) {
+      await db.execute(
+        'UPDATE usuarios SET email = ?, password = ? WHERE id = ?',
+        [email, passNueva, userId]
+      );
+    } else {
+      await db.execute(
+        'UPDATE usuarios SET email = ? WHERE id = ?',
+        [email, userId]
+      );
+    }
+    req.session.usuario.email = email;
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;
