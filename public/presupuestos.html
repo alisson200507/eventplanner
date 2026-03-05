@@ -6,9 +6,9 @@
   <title>EventPlanner — Presupuestos</title>
   <link rel="stylesheet" href="css/events.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
-<body class="app-body">
+<body>
 
 <nav class="navbar">
   <div class="nav-brand"><span class="brand-icon-sm">✦</span><span class="brand-name">EventPlanner</span></div>
@@ -18,10 +18,12 @@
     <a href="invitados.html" class="nav-link">Invitados</a>
     <a href="presupuestos.html" class="nav-link active">Presupuestos</a>
     <a href="resumen.html" class="nav-link">Reportes</a>
+    <a href="perfil.html" class="nav-link">Mi Perfil</a>
+    <a href="admin.html" class="nav-link">Usuarios</a>
   </div>
   <div class="nav-user">
     <div class="user-avatar" id="userAvatar">M</div>
-    <span id="userName">Mari</span>
+    <span id="userName"></span>
     <button class="btn-ghost" onclick="doLogout()">Logout</button>
   </div>
   <button class="hamburger" onclick="toggleMenu()">☰</button>
@@ -30,39 +32,46 @@
 <main class="main-content">
   <div class="page-header">
     <h2>Presupuestos</h2>
-    <button class="btn-primary" onclick="openModal('modalNuevoPresupuesto')">+ Agregar Partida</button>
+    <button class="btn-primary" onclick="openModal('modalNuevoPresupuesto'); populateEventoSelects(); resetModalPresupuesto()">+ Agregar Partida</button>
   </div>
-  <div class="search-bar">
-    <select id="filterEventoPresupuesto" onchange="renderPresupuestos()">
-      <option value="">Todos los eventos</option>
-    </select>
-  </div>
-  <div class="presupuesto-layout">
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Categoría</th>
-            <th>Evento</th>
-            <th>Presupuesto</th>
-            <th>Gastado</th>
-            <th>Diferencia</th>
-            <th>Notas</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="presupuestoTbody"></tbody>
-      </table>
+
+  <div class="filters-row" style="margin-bottom:1.2rem">
+    <div class="select-wrap" style="min-width:220px">
+      <select id="filterEventoPresupuesto" onchange="renderPresupuestos()">
+        <option value="">Todos los eventos</option>
+      </select>
     </div>
+  </div>
+
+  <div class="presupuesto-layout">
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Evento</th>
+              <th>Presupuesto</th>
+              <th>Gastado</th>
+              <th>Diferencia</th>
+              <th>Notas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="presupuestoTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="card chart-card">
       <div class="card-header"><h3>Distribución</h3></div>
-      <canvas id="presupuestoChart" height="260"></canvas>
+      <canvas id="presupuestoChart"></canvas>
     </div>
   </div>
 </main>
 
 <!-- Modal Presupuesto -->
-<div id="modalNuevoPresupuesto" class="modal-overlay" onclick="closeModalOutside(event,'modalNuevoPresupuesto')">
+<div class="modal-overlay" id="modalNuevoPresupuesto" onclick="closeModalOutside(event,'modalNuevoPresupuesto')">
   <div class="modal">
     <div class="modal-header">
       <h3 id="modalPresTitle">Nueva Partida</h3>
@@ -70,14 +79,34 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="presupuestoId">
-      <div class="form-group"><label>Evento *</label><select id="presEvento"></select></div>
-      <div class="form-group"><label>Categoría *</label><input type="text" id="presCategoria" placeholder="Catering, Decoración..."></div>
-      <div class="form-row">
-        <div class="form-group"><label>Presupuesto ($)</label><input type="number" id="presPresupuesto" placeholder="10000"></div>
-        <div class="form-group"><label>Gastado ($)</label><input type="number" id="presGastado" placeholder="0"></div>
+      <div class="form-group">
+        <label>Evento</label>
+        <div class="select-wrap">
+          <select id="presEvento"></select>
+        </div>
       </div>
-      <div class="form-group"><label>Proveedor</label><input type="text" id="presProveedor" placeholder="Nombre del proveedor"></div>
-      <div class="form-group"><label>Notas</label><textarea id="presNotas" placeholder="Detalles..."></textarea></div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <input type="text" id="presCategoria" placeholder="Ej: Catering, Decoración, Música...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Presupuesto ($)</label>
+          <input type="number" id="presPresupuesto" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Gastado ($)</label>
+          <input type="number" id="presGastado" placeholder="0.00" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Proveedor</label>
+        <input type="text" id="presProveedor" placeholder="Nombre del proveedor">
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="presNotas" placeholder="Notas adicionales..."></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('modalNuevoPresupuesto')">Cancelar</button>
