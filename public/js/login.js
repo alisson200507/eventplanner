@@ -1,21 +1,21 @@
 async function doLogin() {
   const userId = parseInt(document.getElementById('loginUser').value);
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+
   if (!userId) { showToast('Selecciona un organizador', 'error'); return; }
-  
-  const boxes = document.querySelectorAll('.pin-box');
-  const pin = Array.from(boxes).map(b => b.value).join('');
-  if (pin.length < 4) { showToast('Ingresa tu PIN de 4 dígitos', 'error'); return; }
+  if (!email) { showToast('Ingresa tu correo', 'error'); return; }
+  if (!password) { showToast('Ingresa tu contraseña', 'error'); return; }
 
   const btn = document.querySelector('.btn-primary.full');
   btn.textContent = 'Verificando...';
   btn.disabled = true;
 
   try {
-    const res = await DB.login(userId, pin);
+    const res = await DB.login(userId, email, password);
     if (!res || res.error) {
-      showToast('PIN incorrecto', 'error');
-      boxes.forEach(b => { b.value = ''; b.style.borderColor = 'var(--rose)'; });
-      setTimeout(() => boxes.forEach(b => b.style.borderColor = ''), 1500);
+      showToast('Correo o contraseña incorrectos', 'error');
+      document.getElementById('loginPassword').value = '';
       btn.textContent = 'Iniciar sesión';
       btn.disabled = false;
       return;
@@ -40,27 +40,13 @@ async function cargarUsuarios() {
       });
     }
   } catch (err) {
-    // Si falla pone usuarios por defecto
     const select = document.getElementById('loginUser');
     select.innerHTML = `
       <option value="">Seleccionar organizador...</option>
       <option value="1">Mari — Organizador General</option>
       <option value="2">Carlos — Organizador Evento</option>
-      <option value="3">Ana — Organizador Personal</option>
-    `;
+      <option value="3">Ana — Organizador Personal</option>`;
   }
-}
-
-function setupPinInputs() {
-  const boxes = document.querySelectorAll('.pin-box');
-  boxes.forEach((box, i) => {
-    box.addEventListener('input', () => {
-      if (box.value.length === 1 && i < boxes.length - 1) boxes[i + 1].focus();
-    });
-    box.addEventListener('keydown', (e) => {
-      if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
-    });
-  });
 }
 
 function showToast(msg, type = 'success') {
@@ -72,5 +58,4 @@ function showToast(msg, type = 'success') {
 
 document.addEventListener('DOMContentLoaded', () => {
   cargarUsuarios();
-  setupPinInputs();
 });

@@ -25,8 +25,9 @@ const DB = {
   },
 
   async getUsuarios() { return this.request('GET', '/api/usuarios'); },
-  async login(usuario_id, pin) { return this.request('POST', '/api/login', { usuario_id, pin }); },
-  async logout() { await this.request('POST', '/api/logout'); this.clearSession(); },
+  async login(usuario_id, email, password) { 
+  return this.request('POST', '/api/login', { usuario_id, email, password }); 
+},
   async getMe() { return this.request('GET', '/api/me'); },
 
   async getEventos() { return await this.request('GET', '/api/eventos') || []; },

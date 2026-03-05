@@ -26,15 +26,12 @@
         <option value="">Seleccionar organizador...</option>
       </select>
     </div>
-    <label>PIN de acceso</label>
-    <div class="pin-inputs">
-      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
-      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
-      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
-      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
-    </div>
+    <label>Correo Electrónico</label>
+    <input type="email" id="loginEmail" placeholder="correo@ejemplo.com">
+    <label>Contraseña</label>
+    <input type="password" id="loginPassword" placeholder="••••••••">
     <button class="btn-primary full" onclick="doLogin()">Iniciar sesión</button>
-    <p class="login-hint">PIN de prueba: 1234</p>
+    <p class="login-hint">¿Problemas para entrar? Contacta al administrador</p>
   </div>
 </div>
 <div id="toast" class="toast"></div>
