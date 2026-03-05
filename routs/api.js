@@ -2,19 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require('../configuracion/db');
 
-function authRequired(req, res, next) {
-  if (!req.session.usuario) return res.status(401).json({ error: 'No autorizado' });
-  next();
-}
-
 router.post('/login', async (req, res) => {
   try {
-    const { usuario_id, email, password } = req.body;
+    const { usuario_id } = req.body;
     const [rows] = await db.execute(
-      'SELECT * FROM usuarios WHERE id = ? AND email = ? AND password = ?',
-      [usuario_id, email, password]
+      'SELECT * FROM usuarios WHERE id = ?',
+      [usuario_id]
     );
-    if (rows.length === 0) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    if (rows.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
     req.session.usuario = rows[0];
     res.json({ ok: true, usuario: rows[0] });
   } catch (err) {
@@ -35,9 +30,51 @@ router.get('/me', (req, res) => {
 
 router.get('/usuarios', async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT id, nombre, rol, avatar FROM usuarios');
+    const [rows] = await db.execute('SELECT id, nombre, rol, avatar, email FROM usuarios');
     res.json(rows);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/usuarios', async (req, res) => {
+  try {
+    const { nombre, email, password, avatar, rol, pin } = req.body;
+    const [result] = await db.execute(
+      'INSERT INTO usuarios (nombre, rol, pin, email, password, avatar) VALUES (?,?,?,?,?,?)',
+      [nombre, rol, pin || '1234', email || null, password || null, avatar || nombre[0]?.toUpperCase() || 'U']
+    );
+    res.json({ ok: true, id: result.insertId });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/usuarios/:id', async (req, res) => {
+  try {
+    const { nombre, email, password, avatar, rol } = req.body;
+    if (password) {
+      await db.execute(
+        'UPDATE usuarios SET nombre=?, email=?, password=?, avatar=?, rol=? WHERE id=?',
+        [nombre, email, password, avatar, rol, req.params.id]
+      );
+    } else {
+      await db.execute(
+        'UPDATE usuarios SET nombre=?, email=?, avatar=?, rol=? WHERE id=?',
+        [nombre, email, avatar, rol, req.params.id]
+      );
+    }
+    res.json({ ok: true });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/usuarios/:id', async (req, res) => {
+  try {
+    await db.execute('DELETE FROM usuarios WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -188,6 +225,7 @@ router.delete('/presupuestos/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 router.put('/perfil', async (req, res) => {
   try {
     if (!req.session.usuario) return res.status(401).json({ error: 'No autorizado' });
@@ -204,10 +242,7 @@ router.put('/perfil', async (req, res) => {
         [email, passNueva, userId]
       );
     } else {
-      await db.execute(
-        'UPDATE usuarios SET email = ? WHERE id = ?',
-        [email, userId]
-      );
+      await db.execute('UPDATE usuarios SET email = ? WHERE id = ?', [email, userId]);
     }
     req.session.usuario.email = email;
     res.json({ ok: true });

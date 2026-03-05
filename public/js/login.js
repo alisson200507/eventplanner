@@ -1,30 +1,24 @@
 async function doLogin() {
   const userId = parseInt(document.getElementById('loginUser').value);
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value.trim();
-
   if (!userId) { showToast('Selecciona un organizador', 'error'); return; }
-  if (!email) { showToast('Ingresa tu correo', 'error'); return; }
-  if (!password) { showToast('Ingresa tu contraseña', 'error'); return; }
 
   const btn = document.querySelector('.btn-primary.full');
-  btn.textContent = 'Verificando...';
+  btn.textContent = 'Entrando...';
   btn.disabled = true;
 
   try {
-    const res = await DB.login(userId, email, password);
+    const res = await DB.login(userId);
     if (!res || res.error) {
-      showToast('Correo o contraseña incorrectos', 'error');
-      document.getElementById('loginPassword').value = '';
-      btn.textContent = 'Iniciar sesión';
+      showToast('Error al entrar', 'error');
+      btn.textContent = 'Entrar';
       btn.disabled = false;
       return;
     }
     DB.saveSession(res.usuario);
     window.location.href = 'dashboard.html';
-  } catch (err) {
+  } catch(err) {
     showToast('Error de conexión', 'error');
-    btn.textContent = 'Iniciar sesión';
+    btn.textContent = 'Entrar';
     btn.disabled = false;
   }
 }
@@ -39,9 +33,8 @@ async function cargarUsuarios() {
         select.innerHTML += `<option value="${u.id}">${u.nombre} — ${u.rol}</option>`;
       });
     }
-  } catch (err) {
-    const select = document.getElementById('loginUser');
-    select.innerHTML = `
+  } catch(err) {
+    document.getElementById('loginUser').innerHTML = `
       <option value="">Seleccionar organizador...</option>
       <option value="1">Mari — Organizador General</option>
       <option value="2">Carlos — Organizador Evento</option>
@@ -56,6 +49,4 @@ function showToast(msg, type = 'success') {
   setTimeout(() => toast.className = 'toast', 3000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  cargarUsuarios();
-});
+document.addEventListener('DOMContentLoaded', cargarUsuarios);

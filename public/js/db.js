@@ -25,8 +25,8 @@ const DB = {
   },
 
   async getUsuarios() { return this.request('GET', '/api/usuarios'); },
-  async login(usuario_id, email, password) { 
-    return this.request('POST', '/api/login', { usuario_id, email, password }); 
+  async login(usuario_id) {
+    return this.request('POST', '/api/login', { usuario_id });
   },
   async logout() { await this.request('POST', '/api/logout'); this.clearSession(); },
   async getMe() { return this.request('GET', '/api/me'); },
@@ -44,6 +44,10 @@ const DB = {
   async getPresupuestos() { return await this.request('GET', '/api/presupuestos') || []; },
   async crearPresupuesto(data) { return this.request('POST', '/api/presupuestos', data); },
   async actualizarPresupuesto(id, data) { return this.request('PUT', `/api/presupuestos/${id}`, data); },
- async eliminarPresupuesto(id) { return this.request('DELETE', `/api/presupuestos/${id}`); },
-async actualizarPerfil(data) { return this.request('PUT', '/api/perfil', data); }
+  async eliminarPresupuesto(id) { return this.request('DELETE', `/api/presupuestos/${id}`); },
+
+  async crearUsuario(data) { return this.request('POST', '/api/usuarios', data); },
+  async actualizarUsuario(id, data) { return this.request('PUT', `/api/usuarios/${id}`, data); },
+  async eliminarUsuario(id) { return this.request('DELETE', `/api/usuarios/${id}`); },
+  async actualizarPerfil(data) { return this.request('PUT', '/api/perfil', data); }
 };
