@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPlanner — Login</title>
+  <link rel="stylesheet" href="css/events.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="login-bg">
+  <div class="login-orb orb1"></div>
+  <div class="login-orb orb2"></div>
+  <div class="login-orb orb3"></div>
+</div>
+<div class="login-card">
+  <div class="login-brand">
+    <div class="brand-icon">✦</div>
+    <h1>EventPlanner</h1>
+    <p>Sistema de Gestión de Eventos</p>
+  </div>
+  <div class="login-form">
+    <label>Organizador</label>
+    <div class="select-wrap">
+      <select id="loginUser">
+        <option value="">Seleccionar organizador...</option>
+      </select>
+    </div>
+    <label>PIN de acceso</label>
+    <div class="pin-inputs">
+      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-box" type="password" maxlength="1" inputmode="numeric">
+    </div>
+    <button class="btn-primary full" onclick="doLogin()">Iniciar sesión</button>
+    <p class="login-hint">PIN de prueba: 1234</p>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/db.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

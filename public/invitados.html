@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPlanner — Invitados</title>
+  <link rel="stylesheet" href="css/events.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="app-body">
+
+<nav class="navbar">
+  <div class="nav-brand"><span class="brand-icon-sm">✦</span><span class="brand-name">EventPlanner</span></div>
+  <div class="nav-links" id="navLinks">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="eventos.html" class="nav-link">Eventos</a>
+    <a href="invitados.html" class="nav-link active">Invitados</a>
+    <a href="presupuestos.html" class="nav-link">Presupuestos</a>
+    <a href="resumen.html" class="nav-link">Reportes</a>
+  </div>
+  <div class="nav-user">
+    <div class="user-avatar" id="userAvatar">M</div>
+    <span id="userName">Mari</span>
+    <button class="btn-ghost" onclick="doLogout()">Logout</button>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<main class="main-content">
+  <div class="page-header">
+    <h2>Invitados</h2>
+    <button class="btn-primary" onclick="openModal('modalNuevoInvitado')">+ Agregar Invitado</button>
+  </div>
+  <div class="search-bar filters-row">
+    <input type="text" id="searchInvitados" placeholder="🔍 Buscar por nombre, correo o teléfono..." oninput="renderInvitados()">
+    <select id="filterEventoInvitados" onchange="renderInvitados()">
+      <option value="">Todos los eventos</option>
+    </select>
+    <select id="filterRsvp" onchange="renderInvitados()">
+      <option value="">Todos los RSVP</option>
+      <option value="confirmado">Confirmado</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="cancelado">Cancelado</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Evento</th>
+          <th>RSVP</th>
+          <th>Asistencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="invitadosTbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Modal Invitado -->
+<div id="modalNuevoInvitado" class="modal-overlay" onclick="closeModalOutside(event,'modalNuevoInvitado')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalInvitadoTitle">Agregar Invitado</h3>
+      <button class="modal-close" onclick="closeModal('modalNuevoInvitado')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="invitadoId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" id="invNombre" placeholder="Felipe">
+        </div>
+        <div class="form-group">
+          <label>Apellido</label>
+          <input type="text" id="invApellido" placeholder="Martínez">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Correo Electrónico *</label>
+        <input type="email" id="invEmail" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="form-group">
+        <label>Número Telefónico</label>
+        <input type="tel" id="invTelefono" placeholder="+503 7000 0000">
+      </div>
+      <div class="form-group">
+        <label>Evento *</label>
+        <select id="invEvento"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>RSVP</label>
+          <select id="invRsvp">
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Asistencia</label>
+          <select id="invAsistencia">
+            <option value="no_registrada">No registrada</option>
+            <option value="asistio">Asistió</option>
+            <option value="no_asistio">No asistió</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea id="invNotas" placeholder="Restricciones alimenticias, preferencias..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modalNuevoInvitado')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarInvitado()">Guardar Invitado</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="js/db.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/invitados.js"></script>
+</body>
+</html>

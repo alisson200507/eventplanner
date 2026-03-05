@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPlanner — Dashboard</title>
+  <link rel="stylesheet" href="css/events.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body class="app-body">
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon-sm">✦</span>
+    <span class="brand-name">EventPlanner</span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+    <a href="eventos.html" class="nav-link">Eventos</a>
+    <a href="invitados.html" class="nav-link">Invitados</a>
+    <a href="presupuestos.html" class="nav-link">Presupuestos</a>
+    <a href="resumen.html" class="nav-link">Reportes</a>
+  </div>
+  <div class="nav-user">
+    <div class="user-avatar" id="userAvatar">M</div>
+    <span id="userName">Mari</span>
+    <button class="btn-ghost" onclick="doLogout()">Logout</button>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<main class="main-content">
+  <div class="page-header">
+    <h2>Panel de Control</h2>
+    <button class="btn-primary" onclick="openModal('modalNuevoEvento')">+ Nuevo Evento</button>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="stats-row">
+      <div class="stat-card accent-blue">
+        <div class="stat-icon">📅</div>
+        <div><div class="stat-num" id="statProximos">0</div><div class="stat-label">Próximos Eventos</div></div>
+      </div>
+      <div class="stat-card accent-green">
+        <div class="stat-icon">✓</div>
+        <div><div class="stat-num" id="statConcluidos">0</div><div class="stat-label">Concluidos</div></div>
+      </div>
+      <div class="stat-card accent-gold">
+        <div class="stat-icon">👥</div>
+        <div><div class="stat-num" id="statInvitados">0</div><div class="stat-label">Total Invitados</div></div>
+      </div>
+      <div class="stat-card accent-rose">
+        <div class="stat-icon">$</div>
+        <div><div class="stat-num" id="statPresupuesto">$0</div><div class="stat-label">Presupuesto Total</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Próximos Eventos</h3>
+        <div class="month-nav">
+          <button onclick="changeMonth(-1)">‹</button>
+          <span id="calMonth"></span>
+          <button onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+      <div id="proximosEventos" class="eventos-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Invitados Pendientes</h3>
+        <span class="badge-count" id="pendientesCount">0</span>
+      </div>
+      <div id="invitadosPendientes" class="invitados-mini"></div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-header"><h3>Resumen Presupuestos</h3></div>
+      <canvas id="dashChart" height="200"></canvas>
+    </div>
+  </div>
+</main>
+
+<!-- Modal Nuevo Evento -->
+<div id="modalNuevoEvento" class="modal-overlay" onclick="closeModalOutside(event,'modalNuevoEvento')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalEventoTitle">Nuevo Evento</h3>
+      <button class="modal-close" onclick="closeModal('modalNuevoEvento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wizard-steps">
+        <div class="step active" id="step1-indicator">1 Evento</div>
+        <div class="step" id="step2-indicator">2 Lugar</div>
+        <div class="step" id="step3-indicator">3 Presupuesto</div>
+        <div class="step" id="step4-indicator">4 Resumen</div>
+      </div>
+      <div id="wizStep1" class="wiz-step active">
+        <input type="hidden" id="eventoId">
+        <div class="form-group"><label>Nombre del Evento *</label><input type="text" id="eventoNombre" placeholder="Ej: Boda de Laura & Felipe"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Fecha *</label><input type="date" id="eventoFecha"></div>
+          <div class="form-group"><label>Hora</label><input type="time" id="eventoHora"></div>
+        </div>
+        <div class="form-group"><label>Estado</label>
+          <select id="eventoEstado">
+            <option value="proximo">Próximo</option>
+            <option value="en_curso">En curso</option>
+            <option value="concluido">Concluido</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Capacidad Máxima</label><input type="number" id="eventoCapacidad" placeholder="100"></div>
+      </div>
+      <div id="wizStep2" class="wiz-step">
+        <div class="form-group"><label>Lugar / Venue *</label><input type="text" id="eventoLugar" placeholder="Ej: Salón Real"></div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="eventoDireccion" placeholder="Calle, colonia, ciudad"></div>
+        <div class="form-group"><label>Notas del Lugar</label><textarea id="eventoNotasLugar" placeholder="Indicaciones..."></textarea></div>
+      </div>
+      <div id="wizStep3" class="wiz-step">
+        <div class="form-group"><label>Presupuesto Total ($)</label><input type="number" id="eventoPresupuesto" placeholder="50000"></div>
+        <div class="form-group"><label>Organizador</label>
+          <select id="eventoOrganizador">
+            <option value="1">Mari — General</option>
+            <option value="2">Carlos — Evento</option>
+            <option value="3">Ana — Personal</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Descripción</label><textarea id="eventoDescripcion" placeholder="Descripción del evento..."></textarea></div>
+      </div>
+      <div id="wizStep4" class="wiz-step">
+        <p class="wiz-info"> Revisa el resumen y guarda el evento.</p>
+        <div class="event-summary" id="eventSummary"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="wizBack" onclick="wizNav(-1)" style="display:none">← Atrás</button>
+      <button class="btn-primary" id="wizNext" onclick="wizNav(1)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="js/db.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
